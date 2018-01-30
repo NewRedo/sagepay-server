@@ -1,0 +1,21 @@
+{
+  "name": "sagepay-server",
+  "version": "1.0.0",
+  "description": "Simplified Sage Pay server integration.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Phill Luby",
+  "license": "MIT",
+  "dependencies": {
+    "extend": "^3.0.1",
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5",
+    "uuid": "^3.2.1"
+  },
+  "devDependencies": {
+    "express": "^4.16.2",
+    "pug": "^2.0.0-rc.4"
+  }
+}

@@ -1,0 +1,5 @@
+include form-fields-mixin.pug
+
+mixin form(formEnctype, formMethod, formNoValidate)
+		form(action=action,enctype=formEnctype,method=(formMethod || "post"),novalidate=formNoValidate)
+				block

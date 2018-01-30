@@ -1,0 +1,5 @@
+include ./form-field-mixin.pug
+
+mixin formFields(form, errors, values)
+    for field in form
+        +formFieldMixin(field)

@@ -1,0 +1,136 @@
+mixin formFieldMixin(field)
+    if field.type === "hidden"
+        input(type="hidden",name=field.name,value=field.value)
+    else
+        div.form-group(
+            class={
+                "has-error": field.error && field.error != "required",
+                "has-warning": field.error == "required"
+            }
+        )
+            if field.list
+                datalist(id=field.name)
+                    for item in field.list
+                        option(value=item)
+            if field.type !== "info"
+                label.control-label(
+                    for=field.name
+                )= field.label
+            if field.type == "select"
+                select(
+                    class={
+                        "form-control": true
+                    },
+                    id=field.name,
+                    name=field.name,
+                    required=field.required,
+                    list=field.list?field.name:null,
+                    custom-validity= field.error
+                )
+                    - var found = false;
+                    - var options = [{ value: "", label: "" }].concat(field.options);
+                    for option in options
+                        -
+                            if (typeof option === "string") {
+                                option = {
+                                    value: option,
+                                    label: option
+                                };
+                            }
+                            var selected = option.value == (field.value || "");
+                            found = found || selected;
+                        option(
+                            value= option.value,
+                            selected= selected,
+                            title= option.title
+                        )= option.label
+                    if !found
+                        option(value=field.value,selected=true)= field.value
+            else if field.type == "date"
+                -
+                    if (!field.dateFormat) {
+                        throw new Error("Date fields must define dateFormat.");
+                    }
+                input(
+                    class={
+                        "form-control": true
+                    },
+                    id=field.name,
+                    name=field.name,
+                    formula=field.formula,
+                    required=field.required,
+                    pattern=field.dateFormat.replace(/[a-zA-Z]/g, "[0-9]")
+                    value=field.value,
+                    placeholder= field.placeholder || field.dateFormat,
+                    custom-validity= field.error
+                )
+            else if field.type == "date-time"
+                input(
+                    class={
+                        "form-control": true
+                    },
+                    id=field.name,
+                    name=field.name,
+                    formula=field.formula,
+                    required=field.required,
+                    pattern=field.dateFormat.replace(/[a-zA-Z]/g, "[0-9]")
+                    value=field.value,
+                    placeholder=field.placeholder || field.dateFormat,
+                    custom-validity= field.error
+                )
+            else if field.type == "textarea"
+                textarea(
+                    class={
+                        "form-control": true
+                    },
+                    id=field.name,
+                    name=field.name,
+                    formula=field.formula,
+                    required=field.required,
+                    pattern=field.pattern,
+                    autocomplete=field.list?"off":field.autocomplete,
+                    placeholder=field.placeholder,
+                    rows=field.rows,
+                    custom-validity= field.error
+                )= field.value
+            else if field.type === "info"
+                != field.label
+            else if field.type === "signature"
+                p Use your mouse or touchpad.
+                div.signature
+                    input(
+                        id=field.name,
+                        name=field.name,
+                        type="hidden",
+                        value=field.value
+                        )
+                    canvas(
+                        name="signature-pad",
+                        id="signature-pad",
+                        class="signature-pad",
+                        width=560,
+                        height=100
+                        )
+                    a.btn.btn-default.btn-sm(
+                        id="signatureClear"
+                        ) Clear
+            else
+                input(
+                    class={
+                        "form-control": true
+                    },
+                    type=field.type || 'text',
+                    id=field.name,
+                    name=field.name,
+                    formula=field.formula,
+                    step=field.step,
+                    required=field.required,
+                    maxlength=field.maxlength,
+                    pattern=field.pattern,
+                    value=field.value,
+                    list=field.list?field.name:null,
+                    autocomplete=field.list?"off":field.autocomplete,
+                    placeholder=field.placeholder,
+                    custom-validity= field.error
+                )
+            p.help-block= field.help

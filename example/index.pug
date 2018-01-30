@@ -1,0 +1,11 @@
+extends ./page-template
+
+include ./form-mixin
+
+block content
+    if content
+        != content
+    if form
+        +form()
+            +formFields(form)
+            button(type="submit") Submit
