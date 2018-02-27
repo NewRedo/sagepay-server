@@ -27,6 +27,14 @@ node example
 
 Then access your server using a web browser on port 80. You will be asked for configuration information and redirected to a page where you can enter a transaction registration request.
 
+### Running the example in test mode
+
+To run the example in test mode use the following command:
+```
+TEST_MODE=1 node example
+```
+In test mode, the module will bypass the Sage Pay API and return a successful transaction.
+
 ## Documentation
 
 ### SagepayServerExpress
@@ -49,6 +57,7 @@ var foo = new SagepayServerExpress(options);
 * `options.putTransaction` Required. See `SagepayServerExpress.putTransaction`.
 * `options.getTransaction` Required. See `SagepayServerExpress.getTransaction`.
 * `options.getCompletionUrl` Required. See `SagepayServerExpress.getCompletionUrl`.
+* `options.testMode` Optional (default set to false). If true, will bypass the Sage Pay API.
 
 #### SagepayServerExpress.putTransaction
 

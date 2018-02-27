@@ -3,6 +3,7 @@
 const assert = require("assert");
 const extend = require("extend");
 const SagepayServerUtil = require("./sagepay-server-util");
+const testTransaction = require("./test-transaction");
 
 // These characters are the only valid key and value characters.
 // WARNING: The character that looks like a Z below is not what it seems.
@@ -61,28 +62,33 @@ class SagepayServerExpress {
 
         const validStatusValues = ["OK", "OK REPEATED"];
         var registerResponse;
-        this._util.register(transaction).then(
-            (data) => {
-                if (validStatusValues.indexOf(data.Status) < 0) {
-                    throw new Error(data.StatusDetail);
-                }
-                registerResponse = data;
-                return;
-            }
-        ).then(
-            () => {
-                return this._options.putTransaction({
-                    registration: {
-                        request: transaction,
-                        response: registerResponse
+        if (this._options.testMode) {
+            testTransaction(transaction, this._options, this._util, req, res, next);
+        } else {
+            this._util.register(transaction).then(
+                (data) => {
+                    if (validStatusValues.indexOf(data.Status) < 0) {
+                        throw new Error(data.StatusDetail);
                     }
-                });
-            }
-        ).then(
-            () => {
-                res.redirect(registerResponse.NextURL);
-            }
-        ).catch(next);
+                    registerResponse = data;
+                    return;
+                }
+            ).then(
+                () => {
+                    return this._options.putTransaction({
+                        registration: {
+                            request: transaction,
+                            response: registerResponse
+                        }
+                    });
+                }
+            ).then(
+                () => {
+                    res.redirect(registerResponse.NextURL);
+                }
+            ).catch(next);
+        }
+
     }
 
     /*
