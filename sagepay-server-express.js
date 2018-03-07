@@ -36,8 +36,8 @@ class SagepayServerExpress {
     SagepayServerIntegration(options)
     @options Optional. Contains connetion options.
     @options.gatewayUrl
-        Optional. The URL of the payment gateway, defaults to the Sage Pay
-        test system.
+        Optional. The URL of the payment gateway, defaults to the Sage Pay test server.
+        Use "test://" for the internal test server.
     */
     constructor(options) {
         assert(options, "options is required");
@@ -62,7 +62,7 @@ class SagepayServerExpress {
 
         const validStatusValues = ["OK", "OK REPEATED"];
         var registerResponse;
-        if (this._options.testMode) {
+        if (this._options.gatewayUrl === "test://") {
             testTransaction(transaction, this._options, this._util, req, res, next);
         } else {
             this._util.register(transaction).then(
@@ -122,8 +122,12 @@ class SagepayServerExpress {
                         err.code = "ESAGEPAYINVALID";
                         throw err;
                     }
+                    transaction.notification = {
+                        request: notification
+                    };
                     return this._options.getCompletionUrl(
-                        notification
+                        req,
+                        transaction
                     );
                 }
             )
@@ -134,10 +138,7 @@ class SagepayServerExpress {
                         RedirectUrl: redirectUrl
                     };
                     formattedResponse = this._util.formatNotificationResponse(response);
-                    transaction.notification = {
-                        request: notification,
-                        response: response
-                    };
+                    transaction.notification.response = response;
                     return this._options.putTransaction(transaction);
                 }
             ).then(() => {

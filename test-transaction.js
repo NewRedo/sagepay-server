@@ -51,8 +51,12 @@ module.exports = function(transaction, options, util, req, res, next) {
         .then(
             (data) => {
                 updatedTransaction = data;
+                data.notification = {
+                    request: notification
+                };
                 return options.getCompletionUrl(
-                    notification
+                    req,
+                    data
                 );
             }
         )
@@ -63,10 +67,7 @@ module.exports = function(transaction, options, util, req, res, next) {
                     RedirectUrl: redirectUrl
                 };
                 formattedResponse = util.formatNotificationResponse(response);
-                updatedTransaction.notification = {
-                    request: notification,
-                    response: response
-                };
+                updatedTransaction.notification.response = response;
                 return options.putTransaction(updatedTransaction).then(() => {
                     return redirectUrl;
                 });

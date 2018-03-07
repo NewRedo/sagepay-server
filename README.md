@@ -22,7 +22,7 @@ Then to start the server run:
 
 ```
 npm install
-node example
+node example --vendor <your-vendor>
 ```
 
 Then access your server using a web browser on port 80. You will be asked for configuration information and redirected to a page where you can enter a transaction registration request.
@@ -31,7 +31,7 @@ Then access your server using a web browser on port 80. You will be asked for co
 
 To run the example in test mode use the following command:
 ```
-TEST_MODE=1 node example
+node example --vendor <your-vendor> --gatewayUrl test://
 ```
 In test mode, the module will bypass the Sage Pay API and return a successful transaction.
 
@@ -99,10 +99,11 @@ An implementation must be provided when the constructor is called.
 Returns a `Promise` that resolves to the `string` URL that the user should be redirected to following the transaction.
 
 ```
-function(notification) { ... }
+function(req, transaction) { ... }
 ```
 
-* `notification` an object containing values from the notification sent by Sage Pay.
+* `req` the Express request object. `res` and `next` are not provided as these should not be called directly by user code.
+* `transaction` an object containing full transaction, including the notification from Sage Pay.
 
 #### SagepayServerExpress.register
 
