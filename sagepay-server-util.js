@@ -42,7 +42,7 @@ class SagepayServerUtil {
             data.split("\r\n").map(a => a.split("=")).forEach(a => {
                 resultBuffer[a[0]] = a[1];
             });
-            
+
             // Sage Pay provides a value called NextURL, but it is not
             // complete. This fact is not documented by Sage Pay. To save
             // implementers the hassle, we fix it here.
@@ -51,11 +51,11 @@ class SagepayServerUtil {
                 "=",
                 resultBuffer.VPSTxId
             ].join("");
-            
+
             return resultBuffer;
         });
     }
-    
+
     parseNotification(stream) {
         return new Promise(function(accept, reject) {
             parser(stream, {}, function(err) {
@@ -66,8 +66,8 @@ class SagepayServerUtil {
             });
         });
     }
-    
-    validateNotificationSignature(vpsTxId, securityKey, notification) {
+
+    calculateNotificationSignature(vpsTxId, securityKey, notification) {
         var message = [
             vpsTxId,
             notification.VendorTxCode,
@@ -92,17 +92,41 @@ class SagepayServerUtil {
             notification.BankAuthCode
         ].join("");
         var hash = crypto.createHash("md5");
-	    hash.update(message, "utf8");
-	    var expectedSignature = hash.digest("hex").toUpperCase();
-	    var actualSignature = notification.VPSSignature;
-	    return actualSignature === expectedSignature;
+        hash.update(message, "utf8");
+        var expectedSignature = hash.digest("hex").toUpperCase();
+        return expectedSignature;
     }
-    
+
+    validateNotificationSignature(vpsTxId, securityKey, notification) {
+        var expectedSignature = this.calculateNotificationSignature(
+            vpsTxId,
+            securityKey,
+            notification
+        );
+        var actualSignature = notification.VPSSignature;
+        return actualSignature === expectedSignature;
+    }
+
     formatNotificationResponse(response) {
         return Object.keys(response)
             .map(key => [key, response[key]])
             .map(pair => pair.join("="))
             .join("\r\n");
+    }
+
+    // This is used for testing purposes only, normally Sage Pay will parse
+    // the notification response.
+    parseNotificationResponse(response) {
+        var ret = {};
+        response
+            .split("\r\n")
+            .forEach(line => {
+                var splitIndex = line.indexOf("=");
+                var key = line.substr(0, splitIndex);
+                var value = line.substr(splitIndex + 1);
+                ret[key] = value;
+            });
+        return ret;
     }
 }
 

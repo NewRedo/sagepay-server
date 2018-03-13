@@ -5,6 +5,7 @@ const express = require("express");
 const extend = require("extend");
 const path = require("path");
 const SagepayServerExpress = require("..").SagepayServerExpress;
+const url = require("url");
 const uuid = require("uuid");
 const yargs = require('yargs');
 
@@ -16,6 +17,14 @@ const argv = yargs.options({
     vendor: {
         type: "string",
         demandOption: true
+    },
+    port: {
+        type: "number",
+        default: 8080
+    },
+    gatewayUrl: {
+        type: "string",
+        default: "test://"
     }
 }).argv;
 
@@ -51,9 +60,9 @@ var sagepay = new SagepayServerExpress({
     getCompletionUrl: function(req, transaction) {
         var vendorTxCode = transaction.registration.request.VendorTxCode;
         if (transaction.notification.request.Status === "OK") {
-            return Promise.resolve("http://" + req.hostname + "/ok?vendorTxCode=" + vendorTxCode);
+            return Promise.resolve("http://" + req.get("host") + "/ok?vendorTxCode=" + vendorTxCode);
         } else {
-            return Promise.resolve("http://" + req.hostname + "/not-ok?vendorTxCode=" + vendorTxCode);
+            return Promise.resolve("http://" + req.get("host") + "/not-ok?vendorTxCode=" + vendorTxCode);
         }
     }
 });
@@ -64,13 +73,24 @@ var sagepay = new SagepayServerExpress({
 app.all("/", function(req, res, next) {
     res.locals.title = "Register Transaction";
 
+    // Build the notification URL.
+    var notificationUrl = url.parse(req.originalUrl);
+    notificationUrl.hostname = req.hostname;
+    notificationUrl.protocol = "http";
+    notificationUrl.host = req.get("host");
+    notificationUrl.pathname = path.join(
+        notificationUrl.pathname,
+        "notification"
+    );
+    notificationUrl = url.format(notificationUrl);
+
     // We've just got the required fields here with no validation whatsoever.
     req.body = {
         VendorTxCode: uuid(),
         Amount: "10.00",
         Currency: "GBP",
         Description: "Some stuff",
-        NotificationURL: "http://" + req.hostname + "/notification",
+        NotificationURL: notificationUrl,
         BillingSurname: "Smith",
         BillingFirstnames: "John",
         BillingAddress1: "1 Portland Place",
@@ -121,7 +141,7 @@ app.get("/not-ok", function(req, res, next) {
     res.render(path.join(__dirname, "index"));
 });
 
-app.listen(80);
+app.listen(argv.port);
 
 // This is just used for the user input.
 function parseForm(fields, body) {
