@@ -20,19 +20,30 @@ const argv = yargs.options({
     },
     port: {
         type: "number",
-        default: 8080
+        demandOption: true
     },
     gatewayUrl: {
         type: "string",
-        default: "test://"
+        demandOption: true
     }
 }).argv;
 
 var transactionStore = {};
 
+// We create an instance of SagepayServerExpress.
 var sagepay = new SagepayServerExpress({
+    // This is the Vendor provided to you by Sage Pay, use "test://" for the
+    // test mode.
     vendor: argv.vendor,
+
+    // This is the gateway URL provided by Sage Pay. It is usually either their
+    // test or live system URLs.
     gatewayUrl: argv.gatewayUrl,
+
+    // We must provide a function that will save transaction information and
+    // return a Promise that resolves when that process is complete. This is
+    // called when the transaction registration is successful, and when a
+    // valid notification is received and found to be valid.
     putTransaction: function(t) {
         // We are doing this synchronously but the function must return a
         // promise because this would normally be done with asynchronous IO.
@@ -40,6 +51,11 @@ var sagepay = new SagepayServerExpress({
         transactionStore[t.registration.request.VendorTxCode] = extend(true, {}, t);
         return Promise.resolve();
     },
+
+    // We must provide a function that will get transaction information using
+    // the VendorTxCode and returns a Promise that resolves to the transaction
+    // object that was saved in the call to `putTransaction`. This is called
+    // when a notification is received.
     getTransaction: function(vendorTxCode) {
         // We are doing this synchronously but the function must return a
         // promise because this would normally be done with asynchronous IO.
@@ -57,6 +73,11 @@ var sagepay = new SagepayServerExpress({
             return Promise.reject(err);
         }
     },
+
+    // This is called when a notification is received and found to be valid.
+    // It must return a promise that resolves to the URL that the user should
+    // be redirected to. We should include the transaction code on the URL so
+    // that we can look up the information for display without our page.
     getCompletionUrl: function(req, transaction) {
         var vendorTxCode = transaction.registration.request.VendorTxCode;
         if (transaction.notification.request.Status === "OK") {
@@ -120,21 +141,31 @@ app.post("/", function(req, res, next) {
     var valid = parseForm(res.locals.form, req.body);
     if (!valid) return next();
 
-    // Hand over to SagepayServerExpress class.
+    // Hand over to SagepayServerExpress class. The user will be redirected to
+    // the URL that Sage Pay provides.
     sagepay.register(req.body, req, res, next);
 });
 app.all("/", function(req, res, next) {
+    // This renders the form, it gets called on the GET or an invalid POST.
     res.render(path.join(__dirname, "index"));
 });
 
+// The notification must be routed through to the notification function
+// without any other processing. Common mistakes are having existing body
+// parsing middleware in the way, which prevents SagepayServerExpress from
+// parsing the body according to Sage Pay rules.
 app.post("/notification", sagepay.notification.bind(sagepay));
 
+// This is our OK landing page for when a transaction is successful.
 app.get("/ok", function(req, res, next) {
     res.locals.transaction = transactionStore[req.query.vendorTxCode];
     res.locals.content = "<div class='alert alert-success'>Transction succeeded.</div>";
     res.render(path.join(__dirname, "index"));
 });
 
+// This is our NOT OK landing page for when the transaction is not successful.
+// You don't need a different route for this, you would normally provide the
+// transaction code in the URL so you can look up the status.
 app.get("/not-ok", function(req, res, next) {
     res.locals.transaction = transactionStore[req.query.vendorTxCode];
     res.locals.content = "<div class='alert alert-danger'>Transction failed.</div>";

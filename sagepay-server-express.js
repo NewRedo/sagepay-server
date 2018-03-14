@@ -6,7 +6,8 @@ const SagepayServerUtil = require("./sagepay-server-util");
 const testTransaction = require("./test-transaction");
 
 // These characters are the only valid key and value characters.
-// WARNING: The character that looks like a Z below is not what it seems.
+// WARNING: The character that looks like a Z below is not a Z, it is a
+// different unicode character for the upper range that is allowed.
 const validChars = /^[A-ｚ0-9@:,{}"#^\[\]*'\\/\-_.$?+();|! ~]*$/;
 
 /*
@@ -34,17 +35,25 @@ function validate(data) {
 class SagepayServerExpress {
     /*
     SagepayServerIntegration(options)
-    @options Optional. Contains connetion options.
+    @options Required. Contains connetion options.
+    @options.vendor
+        Required. The vendor name provided by Sage Pay.
     @options.gatewayUrl
-        Optional. The URL of the payment gateway, defaults to the Sage Pay test server.
+        Required. The URL to the Sage Pay server gateway.
         Use "test://" for the internal test server.
+    @options.putTransaction
+        Required. See SagepayServerExpress.putTransaction.
+    @options.getTransaction
+        Required. See SagepayServerExpress.getTransaction.
+    @options.getCompletionUrl
+        Required. See SagepayServerExpress.getCompletionurl.
     */
     constructor(options) {
         assert(options, "options is required");
         assert(typeof options.putTransaction === "function", "options.saveTransaction is required");
         assert(typeof options.getTransaction === "function", "options.getTransaction is required");
         assert(typeof options.getCompletionUrl === "function", "options.getCompletionUrl is required");
-        options = extend({}, options); // Copy
+        options = extend({}, options); // Copy to prevent tampering.
         this._options = options;
         this._util = new SagepayServerUtil(options);
     }
@@ -92,13 +101,12 @@ class SagepayServerExpress {
     }
 
     /*
-    Handles the notificate request from Sage Pay.
+    Handles the notification request from Sage Pay.
 
     If the request parses OK the transaction is requested using `getTransaction`
-    and the notification information is saved using `putTransaction`. If the
-    transaction is successful then `commitTransaction` is called, otherwise
-    `abortTransaction` is called. The response to Sage Pay is sent after this
-    and the transaction is always aborted if an error occurs.
+    and the notification information is saved using `putTransaction`. The
+    response to Sage Pay is sent after this and the transaction is always
+    aborted if an error occurs.
     */
     notification(req, res, next) {
         var notification, transaction, formattedResponse;

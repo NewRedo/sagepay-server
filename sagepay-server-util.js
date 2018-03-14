@@ -7,10 +7,6 @@ const extend = require("extend");
 const querystring = require("querystring");
 const request = require("request-promise-native");
 
-const defaultOptions = {
-    gatewayUrl: "https://test.sagepay.com/gateway/service/vspserver-register.vsp"
-};
-
 const parser = bodyParser.urlencoded();
 
 // Alternative interface without express integrtion
@@ -19,11 +15,14 @@ class SagepayServerUtil {
     SagepayServerUtil(options)
     @options Optional. Contains connetion options.
     @options.gatewayUrl
-        Optional. The URL of the payment gateway, defaults to the Sage Pay
-        test system.
+        Required. The URL to the Sage Pay gateway.
+    @options.vendor
+        Required. The vendor name provided by Sage Pay.
     */
     constructor(options) {
-        options = extend({}, defaultOptions, options);
+        assert(options, "options is required");
+        assert(options.gatewayUrl, "options.gatewayUrl is required.");
+        assert(options.vendor, "options.vendor is required.");
         this._options = options;
     }
 
