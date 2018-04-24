@@ -106,7 +106,7 @@ app.all("/", function(req, res, next) {
     notificationUrl = url.format(notificationUrl);
 
     // We've just got the required fields here with no validation whatsoever.
-    req.body = {
+    const testTransaction = {
         VendorTxCode: uuid(),
         Amount: "10.00",
         Currency: "GBP",
@@ -131,19 +131,29 @@ app.all("/", function(req, res, next) {
         type: "textarea",
         required: true,
         rows: 25,
-        value: JSON.stringify(req.body, null, 4)
+        value: JSON.stringify(testTransaction, null, 4)
     }];
 
     next();
 });
+
+app.post("/", bodyParser.urlencoded());
 app.post("/", function(req, res, next) {
     // This is our form where the user confirms their order.
     var valid = parseForm(res.locals.form, req.body);
     if (!valid) return next();
 
+    var transaction;
+    try {
+        transaction = JSON.parse(req.body.transaction);
+    } catch (err) {
+        res.locals.form[0].error = "pattern";
+        return next();
+    }
+
     // Hand over to SagepayServerExpress class. The user will be redirected to
     // the URL that Sage Pay provides.
-    sagepay.register(req.body, req, res, next);
+    sagepay.register(transaction, req, res, next);
 });
 app.all("/", function(req, res, next) {
     // This renders the form, it gets called on the GET or an invalid POST.
