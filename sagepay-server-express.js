@@ -5,32 +5,6 @@ const extend = require("extend");
 const SagepayServerUtil = require("./sagepay-server-util");
 const testTransaction = require("./test-transaction");
 
-// These characters are the only valid key and value characters.
-// WARNING: The character that looks like a Z below is not a Z, it is a
-// different unicode character for the upper range that is allowed.
-const validChars = /^[A-ｚ0-9@:,{}"#^\[\]*'\\/\-_.$?+();|! ~]*$/;
-
-/*
-Checks the data for keys containing characters that are invalid for use in the
-Sage Pay API.
-*/
-function validate(data) {
-    for (var key in data) {
-        if (!(validChars.test(key)))
-            throw new Error("Invalid character in key '" + key + "'.");
-
-        var value = data[key];
-
-        if (!(typeof value === "string") && value.toString)
-            value = value.toString();
-
-        if (value === null) value = "";
-
-        if (!(validChars.test(value)))
-            throw new Error("Invalid character in value for '" + key + "'.");
-    }
-}
-
 // Alternative interface for express
 class SagepayServerExpress {
     /*
@@ -67,7 +41,6 @@ class SagepayServerExpress {
     */
     register(transaction, req, res, next) {
         assert(transaction);
-        validate(transaction);
 
         const validStatusValues = ["OK", "OK REPEATED"];
         var registerResponse;
