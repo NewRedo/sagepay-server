@@ -12,6 +12,7 @@ const yargs = require('yargs');
 const app = express();
 
 app.set("view engine", "pug");
+app.set("trust proxy", "loopback");
 
 const argv = yargs.options({
     vendor: {
@@ -97,7 +98,7 @@ app.all("/", function(req, res, next) {
     // Build the notification URL.
     var notificationUrl = url.parse(req.originalUrl);
     notificationUrl.hostname = req.hostname;
-    notificationUrl.protocol = "http";
+    notificationUrl.protocol = req.protocol;
     notificationUrl.host = req.get("host");
     notificationUrl.pathname = path.join(
         notificationUrl.pathname,
