@@ -9,14 +9,14 @@
   "author": "Phill Luby",
   "license": "MIT",
   "dependencies": {
-    "extend": "^3.0.1",
-    "request": "^2.83.0",
-    "request-promise-native": "^1.0.5",
-    "uuid": "^3.2.1"
+    "extend": "^3.0.2",
+    "request": "^2.88.2",
+    "request-promise-native": "^1.0.9",
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
-    "express": "^4.16.2",
-    "pug": "^2.0.0-rc.4",
-    "yargs": "^11.0.0"
+    "express": "^4.17.1",
+    "pug": "^3.0.0",
+    "yargs": "^16.0.3"
   }
 }

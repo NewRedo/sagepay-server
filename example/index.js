@@ -6,7 +6,7 @@ const extend = require("extend");
 const path = require("path");
 const SagepayServerExpress = require("..").SagepayServerExpress;
 const url = require("url");
-const uuid = require("uuid");
+const { v4: uuid } = require("uuid");
 const yargs = require('yargs');
 
 const app = express();
