@@ -4,10 +4,9 @@ const assert = require("assert");
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
 const extend = require("extend");
-const querystring = require("querystring");
 const request = require("request-promise-native");
 
-const parser = bodyParser.urlencoded();
+const parser = bodyParser.urlencoded({extended: false});
 
 // Alternative interface without express integrtion
 class SagepayServerUtil {

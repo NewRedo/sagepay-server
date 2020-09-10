@@ -138,7 +138,7 @@ app.all("/", function(req, res, next) {
     next();
 });
 
-app.post("/", bodyParser.urlencoded());
+app.post("/", bodyParser.urlencoded({extended: false}));
 app.post("/", function(req, res, next) {
     // This is our form where the user confirms their order.
     var valid = parseForm(res.locals.form, req.body);
