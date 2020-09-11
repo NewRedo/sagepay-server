@@ -5,7 +5,6 @@ const express = require("express");
 const extend = require("extend");
 const path = require("path");
 const SagepayServerExpress = require("..").SagepayServerExpress;
-const url = require("url");
 const { v4: uuid } = require("uuid");
 const yargs = require('yargs');
 
@@ -96,15 +95,8 @@ app.all("/", function(req, res, next) {
     res.locals.title = "Register Transaction";
 
     // Build the notification URL.
-    var notificationUrl = url.parse(req.originalUrl);
-    notificationUrl.hostname = req.hostname;
-    notificationUrl.protocol = req.protocol;
-    notificationUrl.host = req.get("host");
-    notificationUrl.pathname = path.join(
-        notificationUrl.pathname,
-        "notification"
-    );
-    notificationUrl = url.format(notificationUrl);
+    var notificationUrl = new URL(path.join(req.originalUrl, 'notification'), `${req.protocol}://${req.get('host')}`);
+    notificationUrl = notificationUrl.toString();
 
     // We've just got the required fields here with no validation whatsoever.
     const testTransaction = {
@@ -156,7 +148,7 @@ app.post("/", function(req, res, next) {
     // the URL that Sage Pay provides.
     sagepay.register(transaction, req, res, next);
 });
-app.all("/", function(req, res, next) {
+app.all("/", function(req, res) {
     // This renders the form, it gets called on the GET or an invalid POST.
     res.render(path.join(__dirname, "index"));
 });
@@ -168,7 +160,7 @@ app.all("/", function(req, res, next) {
 app.post("/notification", sagepay.notification.bind(sagepay));
 
 // This is our OK landing page for when a transaction is successful.
-app.get("/ok", function(req, res, next) {
+app.get("/ok", function(req, res) {
     res.locals.transaction = transactionStore[req.query.vendorTxCode];
     res.locals.content = "<div class='alert alert-success'>Transction succeeded.</div>";
     res.render(path.join(__dirname, "index"));
@@ -177,7 +169,7 @@ app.get("/ok", function(req, res, next) {
 // This is our NOT OK landing page for when the transaction is not successful.
 // You don't need a different route for this, you would normally provide the
 // transaction code in the URL so you can look up the status.
-app.get("/not-ok", function(req, res, next) {
+app.get("/not-ok", function(req, res) {
     res.locals.transaction = transactionStore[req.query.vendorTxCode];
     res.locals.content = "<div class='alert alert-danger'>Transction failed.</div>";
     res.render(path.join(__dirname, "index"));

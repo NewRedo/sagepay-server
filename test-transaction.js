@@ -4,7 +4,7 @@ const { v1: uuidv1 } = require('uuid');
 const request = require("request-promise-native");
 
 module.exports = function(transaction, options, util, req, res, next) {
-    var transaction = {
+    transaction = {
         registration: {
             request: transaction,
             response: {

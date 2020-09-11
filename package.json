@@ -2,13 +2,18 @@
   "name": "sagepay-server",
   "version": "1.0.1",
   "description": "Simplified Sage Pay server integration.",
+  "repository": "github:NewRedo/sagepay-server",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "engines": {
+    "node": ">=10.0.0"
+  },
   "author": "Phill Luby",
   "license": "MIT",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "extend": "^3.0.2",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9",
