@@ -1,6 +1,6 @@
 {
   "name": "sagepay-server",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Simplified Sage Pay server integration.",
   "repository": "github:NewRedo/sagepay-server",
   "main": "index.js",
