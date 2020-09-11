@@ -1,6 +1,6 @@
 {
   "name": "sagepay-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simplified Sage Pay server integration.",
   "main": "index.js",
   "scripts": {
