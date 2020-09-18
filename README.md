@@ -66,7 +66,7 @@ then you have likely not configured either the vendor name or the valid IPs corr
 
 If you get the error
 * Server error 5006: Unable to redirect to Vendor's web site. The Vendor failed to provide a RedirectionURL.
-you need to provide a `RedirectUrl` (not `RedirectionURL`) on the `/notification` page.
+you need to provide a `RedirectUrl` (not `RedirectionURL`) on the `/notification` page. The `SagepayServerExpress` class handles this correctly, so if it isn't working assure that you've wired up the `/notification` URL to the correct handler.
 
 ## Documentation
 
