@@ -10,6 +10,8 @@ This module provides utility a utility to correctly parse and format messages
 to Sage Pay and Express handler functions that handle the HTTP requests and
 responses properly.
 
+This module will log using the [debug](https://www.npmjs.com/package/debug) logger if test mode is used. Set the DEBUG environment variable to include "sagepay-server (test mode)" (e.g. `DEBUG=sagepay-server*`).
+
 ## Running the example in test mode
 
 The fasted way to try this module is to run the example in test mode.
