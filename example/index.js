@@ -95,7 +95,9 @@ app.all("/", function(req, res, next) {
     res.locals.title = "Register Transaction";
 
     // Build the notification URL.
-    var notificationUrl = new URL(path.join(req.originalUrl, 'notification'), `${req.protocol}://${req.get('host')}`);
+    const notificationPath = path.join(req.originalUrl, 'notification');
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    let notificationUrl = new URL(notificationPath, baseUrl);
     notificationUrl = notificationUrl.toString();
 
     // We've just got the required fields here with no validation whatsoever.
