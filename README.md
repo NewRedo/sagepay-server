@@ -4,7 +4,7 @@ This module provides integration for Node.js applications wishing to utilise Sag
 
 ## Overview
 
-Knowledge of the [Server Integration](https://www.sagepay.co.uk/support/find-an-integration-document/server-integration-documents) is essential.
+Knowledge of the [Server Integration](https://www.sagepay.co.uk/support/find-an-integration-document/server-integration-documents) is essential. In particular, you require a SagePay account, vendor id, gateway URL and to whitelist the IP address of the server you plan to use to host your integration.
 
 This module provides utility a utility to correctly parse and format messages
 to Sage Pay and Express handler functions that handle the HTTP requests and
@@ -58,6 +58,15 @@ node example --vendor <your-sagepay-vendor-name> --gatewayUrl https://test.sagep
 Then access your server using a web browser on port 80. You will be asked for
 configuration information and redirected to a page where you can enter a
 transaction registration request.
+
+If your test page fails to redirect to your gateway URL, giving an error like:
+* Error: 4020 : Information received from an Invalid IP address.
+* Error: 4000 : The VendorName is invalid or the account is not active.
+then you have likely not configured either the vendor name or the valid IPs correctly. Note that despite the precision of the exception messages, either message could indicate either case.
+
+If you get the error
+* Server error 5006: Unable to redirect to Vendor's web site. The Vendor failed to provide a RedirectionURL.
+you need to provide a `RedirectUrl` (not `RedirectionURL`) on the `/notification` page.
 
 ## Documentation
 
