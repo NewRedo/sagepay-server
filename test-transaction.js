@@ -2,6 +2,7 @@
 
 const { v1: uuidv1 } = require('uuid');
 const request = require("request-promise-native");
+const debug = require('debug')('sagepay-server (test mode)')
 
 module.exports = function(transaction, options, util, req, res, next) {
     transaction = {
@@ -18,6 +19,7 @@ module.exports = function(transaction, options, util, req, res, next) {
         }
     };
 
+    debug("Saving transaction %O", transaction);
     // Store the transaction as normal, but don't follow the NextURL.
     options.putTransaction(transaction).then(() => {
         // Send the notification and let that be processed as normal.
@@ -62,7 +64,7 @@ module.exports = function(transaction, options, util, req, res, next) {
                 " - " +
                 result.StatusDetail);
         }
-        console.log("Simulation - redirecting to: " + result.RedirectUrl);
+        debug("Redirecting to: %s", result.RedirectUrl);
         res.redirect(result.RedirectUrl);
     }).catch(next);
 }
