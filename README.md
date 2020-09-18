@@ -62,11 +62,13 @@ transaction registration request.
 If your test page fails to redirect to your gateway URL, giving an error like:
 * Error: 4020 : Information received from an Invalid IP address.
 * Error: 4000 : The VendorName is invalid or the account is not active.
+
 then you have likely not configured either the vendor name or the valid IPs correctly. Note that despite the precision of the exception messages, either message could indicate either case.
 
 If you get the error
 * Server error 5006: Unable to redirect to Vendor's web site. The Vendor failed to provide a RedirectionURL.
-you need to provide a `RedirectUrl` (not `RedirectionURL`) on the `/notification` page. The `SagepayServerExpress` class handles this correctly, so if it isn't working assure that you've wired up the `/notification` URL to the correct handler.
+
+then you need to provide a `RedirectUrl` (not `RedirectionURL`) on the `/notification` page. The `SagepayServerExpress` class handles this correctly, so if it isn't working assure that you've wired up the `/notification` URL to the correct handler.
 
 ## Documentation
 
