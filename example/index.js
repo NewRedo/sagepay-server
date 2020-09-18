@@ -162,7 +162,7 @@ app.post("/notification", sagepay.notification.bind(sagepay));
 // This is our OK landing page for when a transaction is successful.
 app.get("/ok", function(req, res) {
     res.locals.transaction = transactionStore[req.query.vendorTxCode];
-    res.locals.content = "<div class='alert alert-success'>Transction succeeded.</div>";
+    res.locals.content = "<div class='alert alert-success'>Transaction succeeded.</div>";
     res.render(path.join(__dirname, "index"));
 });
 
@@ -171,7 +171,7 @@ app.get("/ok", function(req, res) {
 // transaction code in the URL so you can look up the status.
 app.get("/not-ok", function(req, res) {
     res.locals.transaction = transactionStore[req.query.vendorTxCode];
-    res.locals.content = "<div class='alert alert-danger'>Transction failed.</div>";
+    res.locals.content = "<div class='alert alert-danger'>Transaction failed.</div>";
     res.render(path.join(__dirname, "index"));
 });
 
