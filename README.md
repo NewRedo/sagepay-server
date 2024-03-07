@@ -1,3 +1,7 @@
+| WARNING                                  |
+|:-----------------------------------------|
+| This repository is no longer maintained. |
+
 # Sage Pay Form Server for Node.js
 
 This module provides integration for Node.js applications wishing to utilise Sage Pay Server Integration.
